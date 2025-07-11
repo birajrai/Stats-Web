@@ -45,9 +45,18 @@ app.get('/api/stats/:uuid', async (req, res) => {
             return sendError(res, 404, 'Player not found');
         }
         // stats is stored as JSON string in MySQL
-        const statsJson = safeJsonParse(rows[0].stats);
+        const rawStats = rows[0].stats;
+        console.log('Raw stats from DB:', rawStats);
+        if (rawStats === null || rawStats === undefined || rawStats === '') {
+            return sendError(res, 500, 'Stats data is empty or null');
+        }
+        let statsJson = safeJsonParse(rawStats);
+        // Try to parse again if first parse returns a string (double-encoded JSON)
+        if (typeof statsJson === 'string') {
+            statsJson = safeJsonParse(statsJson);
+        }
         if (!statsJson) {
-            return sendError(res, 500, 'Corrupted stats data');
+            return sendError(res, 500, 'Corrupted stats data: Invalid JSON');
         }
         res.json(statsJson);
     } catch (err) {
