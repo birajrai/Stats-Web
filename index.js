@@ -3,7 +3,7 @@ const mysql = require('mysql2/promise');
 require('dotenv').config();
 
 const app = express();
-const PORT = 3000;
+const PORT = 10000;
 
 // Helper: Standard error response
 function sendError(res, status, message) {
